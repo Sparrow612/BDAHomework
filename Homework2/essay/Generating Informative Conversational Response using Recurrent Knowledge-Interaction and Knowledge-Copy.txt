@@ -1,0 +1,1052 @@
+Generating Informative Conversational Response using Recurrent
+Knowledge-Interaction and Knowledge-Copy
+Xiexiong Lin
+
+Weiyu Jian Jianshan He Taifeng Wang Wei Chu
+Ant Financial Services Group
+{xiexiong.lxx,weiyu.jwy,yebai.hjs}@antfin.com
+{taifeng.wang,weichu.cw}@alibaba-inc.com
+
+Abstract
+
+tem exploiting external knowledge. Knowledgedriven methods focus on generating more informative and meaningful responses via incorporating
+structured knowledge consists of triplets (Zhu et al.,
+2017; Zhou et al., 2018; Young et al., 2018; Liu
+et al., 2018) or unstructured knowledge like documents (Long et al., 2017; Parthasarathi and Pineau,
+2018; Ghazvininejad et al., 2018; Ye et al., 2019).
+Knowledge-based dialogue generation mainly has
+two methods: a pipeline way that deals with knowledge selection and generation successively (Lian
+et al., 2019), and a joint way that integrates knowledge selection into the generation process, for example, several works use Memory Network architectures (Sukhbaatar et al., 2015) to integrate the
+knowledge selection and generation jointly (Dinan
+et al., 2018; Dodge et al., 2015; Parthasarathi and
+Pineau, 2018; Madotto et al., 2018; Ghazvininejad et al., 2018). The pipeline approaches separate knowledge selection from generation, resulting in an insufficient fusion between knowledge
+and generator. When integrating various knowledge, pipeline approaches lack flexibility. The
+joint method with the memory module usually
+uses knowledge information statically. The confidence of knowledge attention decreasing at decoding steps, which has the potential to produce
+inappropriate collocation of knowledge words. To
+generate informative dialogue response that integrates various relevant knowledge without losing
+fluency and coherence, this paper presents an effective knowledge-based neural conversation model
+that enhances the incorporation between knowledge selection and generation to produce more informative and meaningful responses. Our model
+integrates the knowledge into the generator by using a recurrent knowledge interaction that dynamically updates the attentions of knowledge selection
+via decoder state and the updated knowledge attention assists in decoding the next state, which
+
+Knowledge-driven conversation approaches
+have achieved remarkable research attention
+recently. However, generating an informative response with multiple relevant knowledge without losing fluency and coherence is
+still one of the main challenges. To address
+this issue, this paper proposes a method that
+uses recurrent knowledge interaction among
+response decoding steps to incorporate appropriate knowledge. Furthermore, we introduce a knowledge copy mechanism using
+a knowledge-aware pointer network to copy
+words from external knowledge according to
+knowledge attention distribution. Our joint
+neural conversation model which integrates
+recurrent Knowledge-Interaction and knowledge Copy (KIC) performs well on generating informative responses. Experiments
+demonstrate that our model with fewer parameters yields significant improvements over
+competitive baselines on two datasets Wizardof-Wikipedia(average Bleu +87%; abs.:0.034)
+and DuConv(average Bleu +20%; abs.:0.047)
+with different knowledge formats (textual &
+structured) and different languages (English &
+Chinese).
+
+1
+
+Introduction
+
+Dialogue systems have attracted much research
+attention in recent years. Various end-to-end neural generative models based on the sequence-tosequence framework (Sutskever et al., 2014) have
+been applied to the open-domain conversation and
+achieved impressive success in generating fluent
+dialog responses (Shang et al., 2015; Vinyals and
+Le, 2015; Serban et al., 2016). However, many neural generative approaches from the last few years
+confined within utterances and responses, suffering
+from generating uninformative and inappropriate
+responses. To make responses more meaningful
+and expressive, several works on the dialogue sys41
+
+Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, pages 41–52
+July 5 - 10, 2020. c 2020 Association for Computational Linguistics
+
+maintains the confidence of knowledge attention
+during the decoding process, it helps the decoder
+to fetch the latest knowledge information into the
+current decoding state. The generated words ameliorate the knowledge selection that refines the next
+word generation, and such repeated interaction between knowledge and generator is verified to be an
+effective way to integrate multiple knowledge coherently that to generate an informative and meaningful response when knowledge is fully taken account of.
+
+competitive baselines with fewer model parameters.
+
+2
+
+Model Description
+
+Given a dataset D = {(Xi , Yi , Ki )}N
+i=1 , where
+N is the size of the dataset, a dialog response
+Y = {y1 , y2 , . . . , yn } is produced by the conversation history utterance X = {x1 , x2 , . . . , xm },
+using also the relative knowledge set K =
+{k1 , k2 , . . . , ks }. Here, m and n are the numbers of
+tokens in the conversation history X and response
+Y respectively, and s denotes the size of relevant
+knowledge candidates collection K. The relevant
+knowledge candidates collection K is assumed to
+be already provided and the size of candidates set
+is limited. Each relevant knowledge element in
+candidate collection could be a passage or a triplet,
+denoted as k = {κ1 , κ2 , . . . , κl }, where l is the
+number of the tokens in the knowledge element.
+As illustrated in Figure 1, the model KIC proposed
+in this work is based on an architecture involving
+an encoder-decoder framework (Sutskever et al.,
+2014) and a pointer network (Vinyals et al., 2015;
+See et al., 2017). Our model is comprised of four
+major components: (i) an LSTM based utterance
+encoder; (ii) a general knowledge encoder suitable
+for both structural and documental knowledge; (iii)
+a recurrent knowledge interactive decoder; (iv) a
+knowledge-aware pointer network.
+
+Although recurrent knowledge interaction better
+solves the problem of selecting appropriate knowledge for generating the informative response, the
+preferable integration of knowledge into conversation generation still confronts an issue, i.e., it is
+more likely that the description words from external knowledge generated for the dialog response
+have a high probability of being an oov(out-ofvocabulary), which is a common challenge in natural language processing. A neural generative model
+with pointer networks has been shown to have the
+ability to handle oov problems (Vinyals et al., 2015;
+Gu et al., 2016). Very few researches on copyable
+generative models pay attention to handle external
+knowledge, while in knowledge-driven conversation, the description words from knowledge are
+usually an important component of dialog response.
+Thus, we leverage a knowledge-aware pointer network upon recurrent knowledge interactive decoder,
+which integrates the Seq2seq model and pointer
+networks containing two pointers that refer to utterance attention distribution and knowledge attention
+distribution. We show that generating responses
+using the knowledge copy resolves the oov and the
+knowledge incompleteness problems.
+
+2.1
+
+Utterance Encoder
+
+The utterance encoder uses a bi-directional LSTM
+(Schuster and Paliwal, 1997) to encode the utterance inputs by concatenating all tokens in the dialogue history X and obtain the bi-directional hidden state of each xi in utterance, denoted as H =
+{h1 , h2 , . . . , hm }. Combining two-directional hidden states, we have the hidden state h∗t as
+
+In summary, our main contributions are: (i) We
+propose a recurrent knowledge interaction, which
+chooses knowledge dynamically among decoding
+steps, integrating multiple knowledge into the response coherently. (ii) We use a knowledge-aware
+pointer network to do knowledge copy, which
+solves oov problem and keeps knowledge integrity,
+especially for long-text knowledge. (iii) The integration of recurrent knowledge interaction and
+knowledge copy results in more informative, coherent and fluent responses. (iv) Our comprehensive experiments show that our model is general
+for different knowledge formats (textual & structured) and different languages (English & Chinese).
+Furthermore, the results significantly outperform
+
+−−−−→
+←−−−−
+h∗t = [LST M (xt , ht−1 ); LST M (xt , ht+1 )].
+(1)
+2.2
+
+Knowledge Encoder
+
+As illustrated in Model Description, the knowledge
+input is a collection of multiple knowledge candidates K. The relevant knowledge ki can be a
+passage or a triplet. This paper provides a universal
+encoding method for both textual and structured
+knowledge. The relevant knowledge is represented
+as a sequence of tokens, which are encoded by a
+transformer encoder (Vaswani et al., 2017), i.e.,
+zt = T ransf ormer(κt ). Static attention aki is
+42
+
+Figure 1: The architecture of KIC. Here, Udt is calculated by decode-input and utterance context vector Cut at
+current step , Ckt represents the knowledge context vector resulted from dynamic knowledge attention. ugen and
+kgen are two soft switches that control the copy pointer to utterance attention distribution and knowledge attention
+distribution, respectively.
+
+where Vu , bu , ve , Wh , Wsu , bua are learnable parameters.
+Instead of modeling knowledge selection independently, or statically incorporating the representation of knowledge into the generator, this
+paper proposes an interactive method to exploit
+knowledge in response generation recurrently. The
+knowledge attention dt updates as the decoding
+proceeds to consistently retrieve the information
+of the knowledge related to the current decoding
+step so that it helps decode the next state correctly,
+which writes as
+
+used to encode knowledge Z = {z1 , z2 , . . . , zl }
+to obtain the overall representation K rep for the
+relevant knowledge as
+aki = sof tmax(VzT tanh(Wz zi ))
+K rep =
+
+l
+X
+
+aki zi ,
+
+(2)
+(3)
+
+i=1
+
+where VzT and Wz are learnable parameters. So
+far we have the knowledge representations for the
+knowledge candidate collection Ckrep .
+2.3
+
+Recurrent Knowledge Interactive
+Decoder
+
+θit = vkT tanh(Wk Kirep + Wsk st + bak )
+t
+
+The decoder is mainly comprised of a single layer
+LSTM (Hochreiter and Schmidhuber, 1997) to generate dialogue response incorporating the knowledge representations in collection Ckrep . As shown
+in Figure 1, in each step t, the decoder updates its
+state st+1 by utilizing the last decode state st , current decode-input Udt and knowledge context Ckt .
+The current decode-input is computed by the embeddings of the previous word e(yt ) and utterance
+context vector Cut . We provide the procedure as
+eti
+
+=
+
+veT
+
+tanh(Wh hi +
+t
+
+Wsu st
+t
+
++ bua )
+
+u = sof tmax(e )
+m
+X
+Cut =
+uti hi
+
+d = sof tmax(θ )
+s
+X
+t
+Ck =
+dti Kirep ,
+
+(8)
+(9)
+(10)
+
+i
+
+where vk , Wk , Wsk , bak are learnable parameters.
+A knowledge gate g t is employed to determine how
+much knowledge and decode-input is used in the
+generation, which is defined as
+g t = sigmoid(Vg [Udt , Ckt ] + bg ),
+
+(4)
+
+(11)
+
+where Vg and bg are learnable parameters. As the
+steps proceed recurrently, the knowledge gate can
+dynamically update itself as well. Hence, the decoder updates its state as:
+
+(5)
+(6)
+
+i=1
+
+Udt = Vu [e(yt ), Cut ] + bu ,
+
+t
+
+(7)
+
+st+1 = LST M (st , (gt Udt + (1 − g t )Ckt )) (12)
+43
+
+2.4
+
+Knowledge-Aware Pointer Networks
+
+learner. The dataset contains 22311 dialogues
+with 201999 turns, 166787/17715/17497 used for
+train/valid/test, and the test set is split into two
+subsets, Test Seen(8715) and Test Unseen(8782).
+Test Seen has 533 overlapping topics with the training set; Test Unseen contains 58 topics never seen
+before in train or validation. We do not use the
+ground-truth knowledge information provided in
+this dataset because the ability of knowledge selection during generation is a crucial part of our
+model.
+DuConv (Wu et al., 2019b): a proactive conversation dataset with 29858 dialogs and 270399 utterances. The model mainly plays the role of a leading
+player assigned with an explicit goal, a knowledge
+path comprised of two topics, and is provided with
+knowledge related to these two topics. The knowledge in this dataset is a format of the triplet(subject,
+property, object), which totally contains about 144k
+entities and 45 properties.
+
+Pointer networks using a copy mechanism are
+widely used in generative models to deal with oov
+problem. This paper employs a novel knowledgeaware pointer network. Specifically, we expand the
+scope of the original pointer networks by exploiting
+the attention distribution of knowledge representation. Besides, the proposed knowledge-aware
+pointer network shares extended vocabulary between utterance and knowledge that is beneficial
+to decode oov words. As two pointers respectively
+refer to the attention distributions of utterance and
+knowledge, each word generation is determined by
+the soft switch of utterance ugen and the soft switch
+of knowledge kgen , which are defined as
+T
+T
+ugen = σ(wuc
+Cut + wus
+st + wuT Udt + bup ) (13)
+T
+T
+kgen = σ(wkc
+Ckt + wks
+st + wgT Ugt + bkp ), (14)
+T , wT , wT , b , wT , wT , wT , b
+where wuc
+kp are
+us
+u up
+g
+kc
+ks
+learnable parameters. The Ugt here is defined as
+
+Ugt = Vg [e(yt ), Ckt ] + bg ,
+
+3.2
+
+We implement our model both on datasets Wizardof-Wikipedia and DuConv, and compare our approach with a variety of recently competitive baselines in these datasets, respectively. In Wizard-ofWikipedia, we compare the approaches as follows:
+
+(15)
+
+where Vg , bg are learnable parameters. Therefore,
+the final probability of the vocabulary w is
+Pf inal (w) = (λugen + µkgen )Pv (w)+
+X
+X
+λ(1 − ugen )
+uti + µ(1 − kgen )
+dti , (16)
+i
+
+Pv (w) =
+
+sof tmax(V2 (V1 [st , Cut , Ckt ]
+
+i
+
++ b1 ) + b2 ),
+(17)
+
+where V1 , V2 , b1 , b2 , λ and µ are learnable parameters under constrain λ + µ = 1. Note that if the
+word is an oov word and does not appear in utterance, Pv (w) is zero and we copy words from
+knowledge instead of dialogue history.
+
+3
+3.1
+
+Comparison Approaches
+
+• Seq2Seq: an attention-based Seq2Seq without access to external knowledge which
+is widely used in open-domain dialogue.
+(Vinyals and Le, 2015)
+• MemNet(hard/soft): a knowledge grounded
+generation model, where knowledge candidates are selected with semantic similarity(hard); / knowledge candidates are stored
+into the memory units for generation (soft).
+(Ghazvininejad et al., 2018)
+• PostKS(concat/fusion): a hard knowledge
+grounded model with a GRU decoder where
+knowledge is concatenated (concat); / a soft
+model use HGFU to incorporated knowledges
+with a GRU decoder.(Lian et al., 2019)
+
+Experiments
+Datasets
+
+We use two recently released datasets Wizard-ofWikipedia and DuConv, whose knowledge formats
+are sentences and triplets respectively.
+Wizard-of-Wikipedia (Dinan et al., 2018): an
+open-domain chit-chat dataset between agent wizard and apprentice. Wizard is a knowledge expert who can access any information retrieval
+system recalling paragraphs from Wikipedia relevant to the dialogue, which unobserved by the
+agent apprentice who plays a role as a curious
+
+• KIC: Our joint neural conversation model
+named knowledge-aware pointer networks
+and recurrent knowledge interaction hybrid
+generator.
+While in dataset DuConv, a Chinese dialogue
+dataset with structured knowledge, we compare
+to the baselines referred in (Wu et al., 2019b)
+44
+
+that consists of retrieval-based models as well as
+generation-based models.
+3.3
+
+lion and the model size is about 175MB, which decreases about 38% against the overall best baseline
+PostKS(parameters:71 million, model size: 285M)
+
+Metric
+
+We adopt an automatic evaluation with several
+common metrics proposed by (Wu et al., 2019b;
+Lian et al., 2019) and use their available automatic evaluation tool to calculate the experimental
+results to keep the same standards. Metrics include Bleu1/2/3, F1, DISTINCT1/2 automatically
+measure the fluency, coherence, relevance, diversity, etc. Metric F1 evaluates the performance at
+the character level, which mainly uses in Chinese
+dataset DuConv. Our method incorporates generation with knowledge via soft fusion that does
+not select knowledge explicitly, therefore we just
+measure the results of the whole dialog while not
+evaluate performances of knowledge selection independently. Besides, we provide 3 annotators to
+evaluate the results on a human level. The annotators evaluate the quality of dialog response generated on fluency, informativeness, and coherence.
+The score ranges from 0 to 2 to reflect the fluency,
+informativeness, and coherence of results from bad
+to good. For example, of coherence , score 2 means
+the response with good coherence without illogical expression and continues the dialogue history
+reasonably; score 1 means the result is acceptable
+but with a slight flaw; score 0 means the statement
+of result illogically or the result improper to the
+dialog context.
+3.4
+
+3.5
+3.5.1
+
+Results and Analysis
+Automatic Evaluation
+
+As the experimental results on Wizard-ofWikipedia with automatic evaluation summarized
+in Table 1, our approach outperforms all competitive baseline referred to recently working (Lian
+et al., 2019), and achieves significant improvements over most of the automatic metrics both on
+Seen and Unseen Test sets. The Bleu-1 enhances
+slightly in Test Seen while improving obviously in
+Test Unseen. Bleu-2 and Bleu-3 both yield considerable increments not only in Test Seen but in
+Test Unseen as well, for example, the Bleu-3 improves about 126% (absolute improvement: 0.043)
+in Test Seen and about 234%(absolute improvement: 0.047) in Test Unseen. The superior performance on metrics Bleu means the dialog response
+generated by model KIC is closer to the groundtruth response and with preferable fluency. As all
+
+Implement Detail
+
+We implement our model over Tensorflow framework(Abadi et al., 2016). And our implementation of point networks is inspired by the public
+code provided by (See et al., 2017). The utterance sequence concats the tokens of dialog history
+and separated knowledge. And the utterance encoder has a single-layer bidirectional LSTM structure with 256 hidden states while the response
+decoder has a single-layer unidirectional LSTM
+structure with the same dimensional hidden states.
+And the knowledge encoder has a 2-layer transformer structure. We use a vocabulary of 50k words
+with 128 dimensional random initialized embeddings instead of using pre-trained word embeddings. We train our model using Adagrad (Duchi
+et al., 2011) optimizer with a mini-batch size of 128
+and learning rate 0.1 at most 130k iterations(70k iterations on Wizard-of-Wikipedia) on a GPU-P100
+machine. The overall parameters are about 44 mil-
+
+Figure 2: Bleu improvements on Wizard-of-Wikipedia.
+
+Bleu metrics are shown in Figure 2, we can find
+that the improvement of result increasing with the
+augment of Bleu’s grams, which means the dialog response produced via model KIC is more in
+line with the real distribution of ground-truth response in the phrase level, and the better improvement on higher gram’s Bleu reflects the model have
+preferable readability and fluency. Generally, the
+ground-truth responses in datasets make up with
+the expressions from knowledge which conduces
+to the informativeness of response. As the recurrent knowledge interaction module in model KIC
+provides a mechanism to interact with the knowledge when decoding words of dialog response step
+by step. Moreover, the knowledge-aware pointer
+45
+
+Models
+Seq2Seq
+MemNet(hard)
+MemNet(soft)
+PostKS(concat)
+PostKS(fusion)
+KIC(ours)
+
+Test Seen
+Bleu-1/2/3
+DISTINCT-1/2
+0.169/0.066/0.032
+0.036/0.112
+0.159/0.062/0.029
+0.043/0.138
+0.168/0.067/0.034
+0.037/0.115
+0.167/0.066/0.032
+0.056/0.209
+0.172/0.069/0.034
+0.056/0.213
+0.173/0.105/0.077
+0.138/0.363
+
+Test Unseen
+Bleu-1/2/3
+DISTINCT-1/2
+0.150/0.054/0.026
+0.020/0.063
+0.142/0.042/0.015
+0.029/0.088
+0.148/0.048/0.023
+0.026/0.081
+0.144/0.043/0.016
+0.040/0.151
+0.147/0.046/0.021
+0.040/0.156
+0.165/0.095/0.068
+0.072/0.174
+
+Table 1: Automatic Evaluation on Wizard-of-Wikipedia. The results of baselines are taken from (Lian et al., 2019).
+
+Models
+norm retrieval
+norm Seq2Seq
+generation w/o klg.
+generation w/ klg.
+norm generation
+KIC(ours)
+
+F1
+34.73
+39.94
+28.52
+36.21
+41.84
+44.61
+
+Bleu-1
+0.291
+0.283
+0.29
+0.32
+0.347
+0.377
+
+Bleu-2
+0.156
+0.186
+0.154
+0.169
+0.198
+0.262
+
+DISTINCT-1
+0.118
+0.093
+0.032
+0.049
+0.057
+0.123
+
+DISTINCT-2
+0.373
+0.222
+0.075
+0.144
+0.155
+0.308
+
+ppl
+10.96
+20.3
+27.3
+24.3
+10.36
+
+Table 2: Automatic Evaluation on DuConv. Here, klg. denotes knowledge and norm stands for normalization on
+entities with entity types, norm generation is the PostKS in Table1. The results of baselines are taken from (Wu
+et al., 2019b).
+
+network in KIC allows copying words from the
+expression of knowledge while decoding. Therefore, the dialog response generated by KIC contains
+relatively complete phrases of knowledge that as
+knowledge-informativeness as the ground-truth response. In addition, the improvements of metrics
+Bleu increase from Test Seen to Test Unseen, that is
+to say, the KIC with an advantage in case of unseen
+knowledge guided dialogue, which shows that our
+model is superior to address the dialogues with topics never seen before in train or validation. Besides,
+the metrics DISTINCT also achieves impressive
+results and prior than most of the baselines, about
+average 77% over the most competitive method
+PostKS. The metrics DISTINCT mainly reflects the
+diversity of generated words, whose improvements
+indicating that the dialogue response produced by
+KIC could present more information. In addition to
+experiments on Wizard-of-Wikipedia, we also conduct experiments on DuConv to further verify the
+effectiveness of our model on structured knowledge
+incorporated conversation. As the dataset DuConv
+released most recently that we compare our model
+to the baselines mentioned in the (Wu et al., 2019b)
+which are first applied to the DuConv including
+both retrieval-based and generation-based methods. The results presented in Table 2 show that
+our model obtains the highest results in most of
+the metrics with obvious improvement over re-
+
+trieval and generation methods. Concretely, the
+F1, average Bleu, average DISTINCT, and ppl are
+over the best results of baseline norm generation
+about 6.6%, 20.5%, 115.8%, and 5.5%. Similar to
+Wizard-of-Wikipedia, the impressive augments of
+metrics demonstrate that the model has the capacity
+of producing appropriate responses with fluency,
+coherence, and diversity.
+Metrics
+Wizard-of-Wikipedia DuConv
+Fluency
+1.90
+1.97
+Coherence
+1.50
+1.64
+Informativeness
+1.12
+1.62
+Table 3: Human Evaluation for the results of KIC.
+
+3.5.2
+
+Human Evaluation
+
+In human evaluation, according to the dialogue
+history and the related knowledge, the annotators
+evaluate the quality dialog responses in terms of
+fluency and coherence. The score ranges from 0 to
+2; the score is as higher as the responses are more
+fluent, informative, and coherent to the dialog context and integrate more knowledge. Manual evaluation results are summarized in Table 3, the model
+achieves high scores both in Wizard-of-Wikipedia
+and DuConv, meaning that the responses generated
+by KIC also with good fluency, informativeness,
+46
+
+Models
+Part1: seq2seq w/o klg.
+Part2: Part1 + w/ klg.
+Part3: Part2 + klg. copy
+KIC: Part3 + dyn. attn.
+
+F1
+26.43
+36.59
+43.35
+44.61
+
+Bleu-1
+0.187
+0.313
+0.365
+0.377
+
+Bleu-2
+0.100
+0.194
+0.249
+0.262
+
+DISTINCT1
+0.032
+0.071
+0.122
+0.123
+
+DISTINCT2
+0.088
+0.153
+0.301
+0.308
+
+Parameters
+43.47M
+43.50M
+43.59M
+43.63M
+
+Table 4: Automatic Evaluation on progressive components of model KIC over DuConv. Here, klg. and dyn.attn.
+denote knowledge and dynamic attention, klg.copy stands for knowledge-aware pointer networks. Metrics remain
+consistent with Table 2.
+
+Models
+Part1
+Part2
+Part3
+KIC
+
+Test Seen
+Bleu-1/2/3
+DISTINCT-1/2
+0.122/0.049/0.024
+0.026/0.07
+0.154/0.086/0.060
+0.117/0.305
+0.165/0.097/0.071
+0.129/0.341
+0.173/0.105/0.077
+0.138/0.363
+
+Test Unseen
+Bleu-1/2/3
+DISTINCT-1/2
+0.113/0.037/0.014
+0.013/0.033
+0.140/0.071/0.048
+0.038/0.089
+0.155/0.088/0.062
+0.070/0.168
+0.165/0.095/0.068
+0.072/0.174
+
+Table 5: Automatic Evaluation on progressive components of model KIC over Wizard-of-Wikipedia. Here,
+Part1,Part2 and Part3 are the same with Table 4. Metrics remain consistent with Table 1.
+
+and coherence in human view, close to the superior
+performance of automatic evaluation.
+3.6
+
+the considerable improvement at each progressive
+step, the model size and the parameters just increase slightly, which means the model KIC has a
+good cost performance.
+
+Ablation Study
+
+We conduct further ablation experiments to dissect
+our model. Based on the Seq2Seq framework, we
+aggrandize it with each key component of model
+KIC progressively and the results are summarized
+in Table 4 and Table 5. We first incorporate knowledge into Seq2Seq architecture with dot attention
+of knowledge and use a gate to control the utilization of knowledge during generation, and the
+results achieve considerable improvement with the
+help of knowledge. And then, we apply knowledgeaware pointer networks over the model illustrated
+in last step to introduce a copy mechanism, which
+increases effect significantly demonstrates the facilitation of knowledge-aware copy mechanism to
+produce dialogue response with important words
+adopted from utterance and knowledge. In the
+end, we replace the knowledge dot attention by
+dynamic attention updated with decode state recurrently, which is the whole KIC model proposed in
+this paper, and the experimental results show that
+such amelioration also achieves an impressive enhancement. The dynamic update of knowledge attention during decoding effectively integrates multiple knowledge into the response that improves the
+informativeness. The performances of the model
+are gradually improved with the addition of components, meaning that each key component of the
+model KIC plays a crucial role. Additionally, with
+
+3.7
+
+Case Study
+
+As shown in Figure 3, we present the responses
+generated by our proposed model KIC and the
+model PostKS(fusion), which achieves overall best
+performance among competitive baselines. Given
+utterance and knowledge candidates, our model
+is better than PostKS(fusion) to produce contextcoherence responses incorporating appropriate multiple knowledge with complete descriptions. The
+model KIC prefers to integrate more knowledge
+into dialogue response, riching the informative
+without losing fluency. Furthermore, our model has
+an additional capability of handling oov problem,
+which can generate responses with infrequent but
+important words (which are oov words most of the
+time) from the knowledge context, like the ”Alfred
+Hitchcock Presents” in Figure 3. We also compare to the result of the model with static knowledge attention, whose result mismatches between
+the ”award” and the representative work ”Alfred
+Hitchcock Presents”. The static knowledge attention calculated before decoding, the information
+and confidence losing with the decoding step by
+step, leading to mispairing the expression of multiple knowledge. While the recurrent knowledge
+interaction helps the decoder to fetch the closest
+knowledge information into the current decoding
+47
+
+Figure 3: Case study of DuConv. The <unk> means the out-of-vocabulary. KIC(static) denotes the model using
+static knowledge attention instead of recurrent knowledge interaction. Knowledge used in responses are in bold
+letters. Inappropriate words are highlighted with red color.
+
+state, which superior to learn the coherent collocation of multiple knowledge. Some more cases of
+Wizard-of-Wikipedia and DuConv will present in
+the appendix section.
+
+4
+
+end way, which usually manage knowledge via external memory module. (Parthasarathi and Pineau,
+2018) introduced a bag-of-words memory network
+and (Dodge et al., 2015) performed dialogue discussion with long-term memory. (Dinan et al., 2018)
+used a memory network to retrieve knowledge and
+combined with transformer architectures to generate responses. The pipeline approaches lack of
+flexibility as constricted by the separated knowledge selection, and the generation could not exploit
+knowledge sufficiently. The end-to-end approaches
+with memory module attention to knowledge statically, when integrating multiple knowledge into
+a response are easier to be confused. Whereas
+we provide a recurrent knowledge interactive generator that sufficiently fusing the knowledge into
+generation to produce more informative dialogue
+responses.
+
+Related Work
+
+Conversation with knowledge incorporation has received considerable interest recently and is demonstrated to be an effective way to enhance performance. There are two main methods in knowledgebased conversation, retrieval-based approches(Wu
+et al., 2016; Tian et al., 2019) and generation-based
+approaches. The generation-based method which
+achieves more research attention focuses on generating more informative and meaningful responses
+via incorporate generation with structured knowledge (Zhu et al., 2017; Liu et al., 2018; Young et al.,
+2018; Zhou et al., 2018) or documental knowledge(Ghazvininejad et al., 2018; Long et al., 2017).
+Several works integrate knowledge and generation
+in the pipeline way, which deal with knowledge
+selection and generation separately. Pipeline approaches pay more attention to knowledge selection, such as using posterior knowledge distribution
+to facilitate knowledge selection (Lian et al., 2019;
+Wu et al., 2019b) or used context-aware knowledge
+pre-selection to guide select knowledge (Zhang
+et al., 2019). While various works entirety integration the knowledge with generation in an end-to-
+
+Our work is also inspired by several works of
+text generation using copy mechanisms. (Vinyals
+et al., 2015) used attention as a pointer to generate words from the input resource by index-based
+copy. (Gu et al., 2016) incorporated copying into
+seq2seq learning to handle unknown words. (See
+et al., 2017) introduced a hybrid pointer-generator
+that can copy words from the source text while
+retaining the ability to produce novel words. In
+task-oriented dialogue, the pointer networks were
+also used to improve copy accuracy and mitigate
+48
+
+the common out-of-vocabulary problem (Madotto
+et al., 2018; Wu et al., 2019a). Different from
+these works, we extend a pointer network referring
+to attention distribution of knowledge candidates
+that can copy words from knowledge resources and
+generate dialogue responses under the guidance of
+more complete description from knowledge.
+
+5
+
+sequence-to-sequence learning.
+arXiv:1603.06393.
+
+arXiv preprint
+
+Sepp Hochreiter and Jürgen Schmidhuber. 1997.
+Long short-term memory. Neural computation,
+9(8):1735–1780.
+Rongzhong Lian, Min Xie, Fan Wang, Jinhua Peng,
+and Hua Wu. 2019. Learning to select knowledge
+for response generation in dialog systems. arXiv
+preprint arXiv:1902.04911.
+
+Conclusion
+
+We propose a knowledge grounded conversational
+model with a recurrent knowledge interactive
+generator that effectively exploits multiple relevant knowledge to produce appropriate responses.
+Meanwhile, the knowledge-aware pointer networks
+we designed allow copying important words, usually oov words, from knowledge. Experimental
+results demonstrate that our model is powerful to
+generate much more informative and coherent responses than the competitive baseline models. In
+future work, we plan to analyze each turn of dialogue with reinforcement learning architecture, and
+to enhance the diversity of the whole dialogue by
+avoiding knowledge reuse.
+
+Shuman Liu, Hongshen Chen, Zhaochun Ren, Yang
+Feng, Qun Liu, and Dawei Yin. 2018. Knowledge
+diffusion for neural dialogue generation. In Proceedings of the 56th Annual Meeting of the Association
+for Computational Linguistics (Volume 1: Long Papers), pages 1489–1498.
+Yinong Long, Jianan Wang, Zhen Xu, Zongsheng
+Wang, Baoxun Wang, and Zhuoran Wang. 2017. A
+knowledge enhanced generative conversational service agent. In DSTC6 Workshop.
+Andrea Madotto, Chien-Sheng Wu, and Pascale Fung.
+2018. Mem2seq: Effectively incorporating knowledge bases into end-to-end task-oriented dialog systems. arXiv preprint arXiv:1804.08217.
+Prasanna Parthasarathi and Joelle Pineau. 2018. Extending neural generative conversational model using external knowledge sources. arXiv preprint
+arXiv:1809.05524.
+
+References
+Martı́n Abadi, Paul Barham, Jianmin Chen, Zhifeng
+Chen, Andy Davis, Jeffrey Dean, Matthieu Devin,
+Sanjay Ghemawat, Geoffrey Irving, Michael Isard,
+et al. 2016. Tensorflow: A system for large-scale
+machine learning. In 12th {USENIX} Symposium
+on Operating Systems Design and Implementation
+({OSDI} 16), pages 265–283.
+
+Mike Schuster and Kuldip K Paliwal. 1997. Bidirectional recurrent neural networks. IEEE Transactions
+on Signal Processing, 45(11):2673–2681.
+Abigail See, Peter J Liu, and Christopher D Manning. 2017. Get to the point: Summarization
+with pointer-generator networks. arXiv preprint
+arXiv:1704.04368.
+
+Emily Dinan, Stephen Roller, Kurt Shuster, Angela
+Fan, Michael Auli, and Jason Weston. 2018. Wizard
+of wikipedia: Knowledge-powered conversational
+agents. arXiv preprint arXiv:1811.01241.
+
+Iulian V Serban, Alessandro Sordoni, Yoshua Bengio,
+Aaron Courville, and Joelle Pineau. 2016. Building
+end-to-end dialogue systems using generative hierarchical neural network models. In Thirtieth AAAI
+Conference on Artificial Intelligence.
+
+Jesse Dodge, Andreea Gane, Xiang Zhang, Antoine
+Bordes, Sumit Chopra, Alexander Miller, Arthur
+Szlam, and Jason Weston. 2015. Evaluating prerequisite qualities for learning end-to-end dialog systems. arXiv preprint arXiv:1511.06931.
+
+Lifeng Shang, Zhengdong Lu, and Hang Li. 2015. Neural responding machine for short-text conversation.
+arXiv preprint arXiv:1503.02364.
+
+John Duchi, Elad Hazan, and Yoram Singer. 2011.
+Adaptive subgradient methods for online learning
+and stochastic optimization. Journal of Machine
+Learning Research, 12(Jul):2121–2159.
+
+Sainbayar Sukhbaatar, Jason Weston, Rob Fergus, et al.
+2015. End-to-end memory networks. In Advances
+in neural information processing systems, pages
+2440–2448.
+
+Marjan Ghazvininejad, Chris Brockett, Ming-Wei
+Chang, Bill Dolan, Jianfeng Gao, Wen-tau Yih, and
+Michel Galley. 2018. A knowledge-grounded neural
+conversation model. In Thirty-Second AAAI Conference on Artificial Intelligence.
+
+Ilya Sutskever, Oriol Vinyals, and Quoc V Le. 2014.
+Sequence to sequence learning with neural networks.
+In Advances in neural information processing systems, pages 3104–3112.
+Zhiliang Tian, Wei Bi, Xiaopeng Li, and Nevin L
+Zhang. 2019. Learning to abstract for memoryaugmented conversational response generation. In
+
+Jiatao Gu, Zhengdong Lu, Hang Li, and Victor OK
+Li. 2016. Incorporating copying mechanism in
+
+49
+
+(PPL, F1) used in (Dinan et al., 2018). In main
+body, we adopted metrics from (Lian et al., 2019)
+and compared the baselines presented in their work.
+We also implements a comparison using PPL&F1
+metrics and compare to the methods listed in their
+paper. The results are summerized in Table 6 and
+Table 7. The Two-Stage Transformer Memory Networks with knowledge dropout(artificially prevent
+the model from attending to knowledge a fraction
+of the time during training) performs best in TestSeen situation, while our KIC model achieves the
+best performance at Test-Unseen situation.
+
+Proceedings of the 57th Conference of the Association for Computational Linguistics, pages 3816–
+3825.
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob
+Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz
+Kaiser, and Illia Polosukhin. 2017. Attention is all
+you need. In Advances in neural information processing systems, pages 5998–6008.
+Oriol Vinyals, Meire Fortunato, and Navdeep Jaitly.
+2015. Pointer networks. In Advances in Neural Information Processing Systems, pages 2692–2700.
+Oriol Vinyals and Quoc Le. 2015. A neural conversational model. arXiv preprint arXiv:1506.05869.
+
+Models
+
+Chien-Sheng Wu, Richard Socher, and Caiming
+Xiong. 2019a. Global-to-local memory pointer networks for task-oriented dialogue. arXiv preprint
+arXiv:1901.04713.
+
+E2E MemNet (no auxiliary loss)
+E2E MemNet (w/ auxiliary loss)
+Two-Stage MemNet
+Two-Stage MemNet (w/ K.D.)
+KIC
+
+Wenquan Wu, Zhen Guo, Xiangyang Zhou, Hua
+Wu, Xiyuan Zhang, Rongzhong Lian, and Haifeng
+Wang. 2019b. Proactive human-machine conversation with explicit conversation goals. arXiv preprint
+arXiv:1906.05572.
+
+Table 6: Comparisons with metrics from (Dinan
+et al., 2018) over Test-Seen. K.D. denotes knowledge
+dropout which involves artificial effort.
+
+Yu Wu, Wei Wu, Chen Xing, Ming Zhou, and
+Zhoujun Li. 2016. Sequential matching network:
+A new architecture for multi-turn response selection in retrieval-based chatbots. arXiv preprint
+arXiv:1612.01627.
+
+Models
+
+Hao-Tong Ye, Kai-Ling Lo, Shang-Yu Su, and YunNung Chen. 2019. Knowledge-grounded response
+generation with deep attentional latent-variable
+model. arXiv preprint arXiv:1903.09813.
+
+E2E MemNet (no auxiliary loss)
+E2E MemNet (w/ auxiliary loss)
+Two-Stage MemNet
+Two-Stage MemNet (w/ K.D.)
+KIC
+
+Tom Young, Erik Cambria, Iti Chaturvedi, Hao Zhou,
+Subham Biswas, and Minlie Huang. 2018. Augmenting end-to-end dialogue systems with commonsense knowledge. In Thirty-Second AAAI Conference on Artificial Intelligence.
+
+Test Unseen
+PPL
+F1
+103.6 14.3
+97.3 14.4
+88.5 17.4
+84.8 17.3
+65.8 17.3
+
+Table 7: Comparisons with metrics from (Dinan et al.,
+2018) over Test-Unseen. K.D. denotes knowledge
+dropout which involves artificial effort.
+
+Yangjun Zhang, Pengjie Ren, and Maarten de Rijke.
+2019. Improving background based conversation
+with context-aware knowledge pre-selection. arXiv
+preprint arXiv:1906.06685.
+
+B
+
+Additional Cases
+
+We have analyzed many cases both on Wizardof-Wikipedia and DuConv, some of them are presented from Figure 4 to Figure 9. Our model KIC
+performs well in generating a fluent response coherent to the dialogue history as well as integrating
+multiple knowledge. Even in no history context
+situation (the model first to say), the KIC also has
+the capability of incorporating knowledge to start a
+knowledge relevant topic.
+
+Hao Zhou, Tom Young, Minlie Huang, Haizhou Zhao,
+Jingfang Xu, and Xiaoyan Zhu. 2018.
+Commonsense knowledge aware conversation generation
+with graph attention. In IJCAI, pages 4623–4629.
+Wenya Zhu, Kaixiang Mo, Yu Zhang, Zhangbin Zhu,
+Xuezheng Peng, and Qiang Yang. 2017. Flexible
+end-to-end dialogue system for knowledge grounded
+conversation. arXiv preprint arXiv:1709.04264.
+
+A
+
+Test Seen
+PPL F1
+66.5 15.9
+63.5 16.9
+54.8 18.6
+46.5 18.9
+51.9 18.4
+
+Additional Comparison
+
+In dataset Wizard-of-Wikipedia, (Lian et al., 2019)
+used the metrics Bleu1/2/3, distinct1/2 to evaluate
+their work, which different from the origin metrics
+50
+
+Figure 4: Case of wizard-of-wikipedia with no dialog history.
+
+Figure 5: Case of wizard-of-wikipedia with long knowledge copy.
+
+Figure 6: Case of wizard-of-wikipedia with multiple knowledge integration.
+
+Figure 7: Case of DuConv with no dialog history.
+
+51
+
+Figure 8: Case of DuConv with long knowledge copy.
+
+Figure 9: Case of DuConv with multiple knowledge integration.
+
+52
+
+
