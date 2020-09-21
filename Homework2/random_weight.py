@@ -20,6 +20,6 @@ if __name__ == '__main__':
     standard_out = sys.stdout
     sys.stdout = open('result/Random_Weight.txt', 'w')
     for i in range(100):
-        print(wordlist[i][0], wordlist[i][1])
+        print(wordlist[i][0] + '\t' + str(wordlist[i][1]))
     sys.stdout.close()
     sys.stdout = standard_out

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="ba1f2fe4-8455-4059-9e7e-0972889406dc" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/Homework2.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/enwik8" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/text.model" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/text.model.trainables.syn1.npy" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/text.model.trainables.syn1neg.npy" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/text.model.wv.vectors.npy" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/text8" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lda.py" beforeDir="false" afterPath="$PROJECT_DIR$/lda.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/random_weight.py" beforeDir="false" afterPath="$PROJECT_DIR$/random_weight.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/result/LDA.txt" beforeDir="false" afterPath="$PROJECT_DIR$/result/LDA.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/result/Random_Weight.txt" beforeDir="false" afterPath="$PROJECT_DIR$/result/Random_Weight.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/result/TF_IDF.txt" beforeDir="false" afterPath="$PROJECT_DIR$/result/TF_IDF.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/result/TextRank.txt" beforeDir="false" afterPath="$PROJECT_DIR$/result/TextRank.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/textrank.py" beforeDir="false" afterPath="$PROJECT_DIR$/textrank.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tf-idf.py" beforeDir="false" afterPath="$PROJECT_DIR$/tf-idf.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/word2vec.py" beforeDir="false" afterPath="$PROJECT_DIR$/word2vec.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="JupyterTrust" id="aaf5cddf-68c2-4101-a7a2-7d4963cb5f97" />
+  <component name="ProjectId" id="1hmXlXS8wuLiW05YyXmwH8qfMjh" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ba1f2fe4-8455-4059-9e7e-0972889406dc" name="Default Changelist" comment="" />
+      <created>1600617393128</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1600617393128</updated>
+      <workItem from="1600617394376" duration="24000" />
+      <workItem from="1600618810629" duration="264000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

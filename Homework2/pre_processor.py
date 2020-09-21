@@ -2,12 +2,12 @@ import os
 import string
 import re
 import nltk
-from nltk.stem import SnowballStemmer
+from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 
 nltk.download('stopwords')
 
-snowball_stemmer = SnowballStemmer("english")  # 用于词干提取
+lemmas = WordNetLemmatizer()
 
 root_dir = './essay'
 
@@ -20,6 +20,11 @@ def get_essay():
     essays = os.listdir(root_dir)
     essays.remove('.DS_Store')
     return essays
+
+
+def lemma(word: str) -> str:
+    upo_list = ['a', 'v', 'n', 'r']
+    return min([lemmas.lemmatize(word, upo) for upo in upo_list], key=lambda x: len(x))
 
 
 def pre_process():
@@ -35,7 +40,7 @@ def pre_process():
         for w in words:
             w = list(w)
             w = ''.join([c for c in w if c not in string.punctuation])
-            w = snowball_stemmer.stem(w)
+            w = lemma(w)
             if len(w) == 1 and 'a' <= w <= 'z': continue
             if not bool(re.match(r'[a-z]+$', w)): continue
             if w in special_words or w in stoplist: continue
@@ -46,4 +51,4 @@ def pre_process():
 
 if __name__ == '__main__':
     w = 'ahang123'
-    print(snowball_stemmer.stem("distribution"))
+    print(lemma("gone"))

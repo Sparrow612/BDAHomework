@@ -16,6 +16,6 @@ if __name__ == '__main__':
     standard_out = sys.stdout
     sys.stdout = open('result/LDA.txt', 'w')
     for r in result:
-        print(r[0], r[1])
+        print(r[0] + '\t' + str(r[1]))
     sys.stdout.close()
     sys.stdout = standard_out

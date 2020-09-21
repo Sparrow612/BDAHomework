@@ -1,5 +1,4 @@
 import sys
-
 from textrank4zh import TextRank4Keyword
 from Homework2 import pre_processor
 
@@ -21,6 +20,6 @@ if __name__ == '__main__':
     standard_out = sys.stdout
     sys.stdout = open('result/TextRank.txt', 'w')
     for pair in res:
-        print(pair['word'], pair['weight'])
+        print(pair['word']+'\t'+str(pair['weight']))
     sys.stdout.close()
     sys.stdout = standard_out
