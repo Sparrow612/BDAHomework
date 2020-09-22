@@ -14,7 +14,7 @@ if __name__ == '__main__':
     result = lda_model.show_topic(0, 100)
     result.sort(key=lambda x: -x[1])
     standard_out = sys.stdout
-    sys.stdout = open('result/LDA.txt', 'w')
+    sys.stdout = open('result/LDA_dic.txt', 'w')
     for r in result:
         print(r[0] + '\t' + str(r[1]))
     sys.stdout.close()

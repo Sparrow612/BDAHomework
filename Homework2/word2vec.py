@@ -54,33 +54,11 @@ def word2vec_algo():
     return keywords(src, model)
 
 
-def fake():
-    res = set()
-    cur = 0
-    while cur < 430:
-        info = input().split()
-        if not info: break
-        word = info[0]
-        weight = float(info[1])
-        res.add((word, weight))
-        cur += 1
-    res = list(res)
-    res.sort(key=lambda x: -x[1])
+if __name__ == '__main__':
+    result = word2vec_algo()
     standard_out = sys.stdout
     sys.stdout = open('result/Word2Vec.txt', 'w')
-    for i in range(100):
-        r = res[i]
+    for r in result:
         print(r[0] + '\t' + str(r[1]))
     sys.stdout.close()
     sys.stdout = standard_out
-
-
-if __name__ == '__main__':
-    fake()
-    # result = word2vec_algo()
-    # standard_out = sys.stdout
-    # sys.stdout = open('result/Word2Vec.txt', 'w')
-    # for r in result:
-    #     print(r[0] + '\t' + str(r[1]))
-    # sys.stdout.close()
-    # sys.stdout = standard_out
