@@ -14,3 +14,7 @@ WordCount
 3. LDA
 4. Word2Vec
 5. Random
+
+## Homework3
+
+调用了Mathpix API进行手写矩阵识别并计算，主要难点在OCR
