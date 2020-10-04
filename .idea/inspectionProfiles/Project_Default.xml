@@ -34,6 +34,10 @@
           <option value="tuple.set_ylabel" />
           <option value="tuple.grid" />
           <option value="dict.__getitem__" />
+          <option value="Homework4.SVM.dataset" />
+          <option value="dataset" />
+          <option value="visualization" />
+          <option value="int.__getitem__" />
         </list>
       </option>
     </inspection_tool>

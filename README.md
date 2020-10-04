@@ -18,3 +18,9 @@ WordCount
 ## Homework3
 
 调用了Mathpix API进行手写矩阵识别并计算，主要难点在OCR
+
+## Homework4
+
+鸢尾花数据集分类
+
+分别使用SVM，决策树，BPNN算法实现
