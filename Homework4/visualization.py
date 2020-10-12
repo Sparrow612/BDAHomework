@@ -12,9 +12,9 @@ from graphviz import Digraph
 """
 
 
+# 训练集、测试集的训练结果对比
 def get_model_graph(feat_train, label_train, label_train_prediction, feat_test, label_test, label_test_prediction):
     plt.figure()
-
     plt.subplot(221)
     plt.title('Train-Actual')
     plt.scatter(feat_train[:, 0], feat_train[:, 1], c=label_train, edgecolors='k', s=50)
@@ -27,10 +27,11 @@ def get_model_graph(feat_train, label_train, label_train_prediction, feat_test, 
     plt.subplot(224)
     plt.title('Test-Prediction')
     plt.scatter(feat_test[:, 0], feat_test[:, 1], c=label_test_prediction, edgecolors='k', s=50)
-
     plt.show()
 
 
+# the code below is from the Internet
+# used to visualize the decisiontree
 def plot_model(tree, name):
     def _sub_plot(g, tree, inc):
         nonlocal root

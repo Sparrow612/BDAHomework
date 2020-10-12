@@ -3,7 +3,7 @@ KNN算法比较好实现，这里选择手动实现
 将分类器封装在类中，直接用
 """
 import dataset
-import visualization as vl
+# import visualization as vl
 
 
 class KNNClassifier:
@@ -61,5 +61,5 @@ print("测试集: {:.3f}".format(knn.score(dataset.feat_test, dataset.label_test
 label_train_prediction = knn.predict(dataset.feat_train)
 label_test_prediction = knn.predict(dataset.feat_test)
 
-vl.get_model_graph(dataset.feat_test, dataset.label_test, label_test_prediction, dataset.feat_train,
-                   dataset.label_train, label_train_prediction)
+# vl.get_model_graph(dataset.feat_train, dataset.label_train, label_train_prediction, dataset.feat_test, dataset.label_test,
+#                    label_test_prediction)

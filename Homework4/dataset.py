@@ -2,7 +2,7 @@ from sklearn import datasets
 from sklearn.model_selection import train_test_split
 
 """
-为其他算法实现文件提供数据
+为其他算法实现文件提供数据，所有的算法都从此py文件中获取数据
 训练集和测试集比例7:3
 45条测试数据，105条训练数据
 """

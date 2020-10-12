@@ -1,6 +1,6 @@
 import dataset
 import math
-from visualization import plot_model
+# import visualization
 
 
 # 对可能的取值出现的次数进行统计
@@ -127,33 +127,33 @@ class DecisionTreeClassifier:
         predict_set = self.predict(feats_set)
         return len([index for index in range(n) if predict_set[index] == label_set[index]]) / n
 
-    def print_tree(self):
-        # 是否是叶节点
-        def _print(root, indent='-', dict_tree={}, direct='root'):
-            if root.result is not None:
-                dict_tree = {direct: str(root.result) + ':' + dataset.iris_target_name[root.result]}
-            else:
-                left = _print(root.tn, indent=indent + '-', direct='yes')
-                left_copy = left.copy()
-                right = _print(root.fn, indent=indent + '-', direct='no')
-                right_copy = right.copy()
-                left_copy.update(right_copy)
-                cnt = 'dimension:' + str(root.criteria[0]) + ' ' + dataset.iris_feat_name[
-                    root.criteria[0]] + '\nvalue>=:' + str(root.criteria[1]) + '?'
-                if indent != '-':
-                    dict_tree = {direct: {cnt: left_copy}}
-                else:  # 根
-                    dict_tree = {cnt: left_copy}
-            return dict_tree
-
-        return _print(self.tree)
+    # 决策树的可视化代码，word文档中已经有了可视化结果，为了方便单独运行注释掉这段
+    # def print_tree(self):
+    #     def _print(root, indent='-', dict_tree={}, direct='root'):
+    #         if root.result is not None: # 叶节点
+    #             dict_tree = {direct: str(root.result) + ':' + dataset.iris_target_name[root.result]}
+    #         else:
+    #             left = _print(root.tn, indent=indent + '-', direct='yes')
+    #             left_copy = left.copy()
+    #             right = _print(root.fn, indent=indent + '-', direct='no')
+    #             right_copy = right.copy()
+    #             left_copy.update(right_copy)
+    #             cnt = 'dimension:' + str(root.criteria[0]) + ' ' + dataset.iris_feat_name[
+    #                 root.criteria[0]] + '\nvalue>=:' + str(root.criteria[1]) + '?'
+    #             if indent != '-':
+    #                 dict_tree = {direct: {cnt: left_copy}}
+    #             else:  # 根
+    #                 dict_tree = {cnt: left_copy}
+    #         return dict_tree
+    #
+    #     return _print(self.tree)
 
 
 dt_model = DecisionTreeClassifier(dataset.feat_train, dataset.label_train)  # 决策树分类器
 dt_model.fit()  # 训练决策树模型
 predict_y = dt_model.predict(dataset.feat_test)
 score = dt_model.score(dataset.feat_test, dataset.label_test)
-plot_model(dt_model.print_tree(), 'tree_graph.gv')
+# visualization.plot_model(dt_model.print_tree(), 'tree_graph.gv')
 
 print('模型预测结果', predict_y)
 print('预期结果', dataset.label_test)
