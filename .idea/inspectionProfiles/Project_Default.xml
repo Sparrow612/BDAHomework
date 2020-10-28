@@ -19,6 +19,7 @@
           <option value="N802" />
           <option value="N806" />
           <option value="N801" />
+          <option value="N803" />
         </list>
       </option>
     </inspection_tool>
@@ -38,6 +39,7 @@
           <option value="dataset" />
           <option value="visualization" />
           <option value="int.__getitem__" />
+          <option value="set.__getitem__" />
         </list>
       </option>
     </inspection_tool>
